@@ -25,7 +25,7 @@ def MACross(df, type='close', shortPeriod=5, longPeriod=20):
     df['long'] = ta.SMA(df[type],longPeriod)
     shortMA = df['short']
     longMA = df['long']
-    print(df)
+    #print(df)
     if len(df) <= 2 :
         return False
     if shortMA[1] > longMA[1] and shortMA[2] < longMA[2] :

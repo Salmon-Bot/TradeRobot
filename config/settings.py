@@ -109,7 +109,7 @@ DATABASE_SERVER_PASSWORD = None
 
 # 邮件通知，配置SMTP，获取其AuthCode即可发送邮件
 MAIL_ACCOUNT = "710777350@qq.com"
-MAIL_AUTH_CODE = ""
+MAIL_AUTH_CODE = "famqcgmaidkkbdgc"
 MAIL_RECEIPIENTS = ["ahbbhywmd@163.com"]
 
 # API 请求地址
