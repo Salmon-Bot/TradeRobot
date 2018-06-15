@@ -1,6 +1,7 @@
 # **HuobiAutomaticTradePlatform**
 
 ## **火币自动化交易平台机器人**
+依赖ta-lib提供指标支持
 
 ### **一.功能设计**
 1. 大单买卖监测（交易量在10+BTC的买卖监测）

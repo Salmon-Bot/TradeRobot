@@ -1,5 +1,8 @@
+import datetime
 from config import settings
-from common.email.mail_agent import mail_agent
+from common.email import mail_agent
+from config import settings
+
 
 # 记录上一次邮件发送的时间
 last_mail_datetime = None
@@ -13,5 +16,9 @@ def send_mail(title, content):
             minutes=settings.N_MINUTES_STATE):
         return
     last_mail_datetime = now
-    with mail_agent.SMTP() as s:
+
+    if settings.MAIL_ACCOUNT and settings.MAIL_AUTH_CODE:
+        agent = mail_agent.MailAgent(settings.MAIL_ACCOUNT, settings.MAIL_AUTH_CODE)
+
+    with agent.SMTP() as s:
         s.send(settings.MAIL_RECEIPIENTS, content, title)

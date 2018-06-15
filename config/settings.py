@@ -108,9 +108,9 @@ DATABASE_SERVER_USERNAME = None
 DATABASE_SERVER_PASSWORD = None
 
 # 邮件通知，配置SMTP，获取其AuthCode即可发送邮件
-MAIL_ACCOUNT = None
-MAIL_AUTH_CODE = None
-MAIL_RECEIPIENTS = []
+MAIL_ACCOUNT = "710777350@qq.com"
+MAIL_AUTH_CODE = ""
+MAIL_RECEIPIENTS = ["ahbbhywmd@163.com"]
 
 # API 请求地址
 MARKET_URL = "https://api.huobipro.com"

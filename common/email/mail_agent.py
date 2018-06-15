@@ -11,150 +11,150 @@ from email.header import decode_header
 from email import message_from_bytes
 
 #找到对应文件的路径，如果不在环境变量则添加到环境变量
-file_path = os.path.dirname(os.path.dirname())
-if file_path not in sys.path:
-	sys.path.insert(0,p)
+# file_path = os.path.dirname(os.path.dirname())
+# if file_path not in sys.path:
+#     sys.path.insert(0,file_path)
 
 SERVER_LIB = {
-	'sample.com':{
-		'smtp':'smtp.sample.com',
-		'imap':'imap.sample.com',
-		'smtp_port':0,
-		'imap_port':0,
-		'use_ssl':true
-	}
+    'sample.com':{
+        'smtp':'smtp.sample.com',
+        'imap':'imap.sample.com',
+        'smtp_port':0,
+        'imap_port':0,
+        'use_ssl':True
+    }
 }
 
 class MailAgent(object):
 
-	def __init__(self,acconut,auth_code,name='',**config):
+    def __init__(self,account,auth_code,name='',**config):
 
-		acconut,server_name = account().split('@')
+        account_name,server_name = account.split('@')
 
-		self.smtp = 'smtp.' + server_name
-		self.imap = 'imap.' + server_name
-		self.smtp_port = 0
-		self.imap_port = 0
-		self.use_ssl = True
-		self.name = '%s<%s>' % (name or account_name,account)
-		self.account = account
-		self.auth_code = auth_code
+        self.smtp = 'smtp.' + server_name
+        self.imap = 'imap.' + server_name
+        self.smtp_port = 0
+        self.imap_port = 0
+        self.use_ssl = True
+        self.name = '%s<%s>' % (name or account_name,account)
+        self.account = account
+        self.auth_code = auth_code
 
-		#将SERVER_LIB和config更新入对象属性
-		self.__dict__.update(SERVER_LIB.get(server_name,{}))
-		self.__dict__.update(config)
+        #将SERVER_LIB和config更新入对象属性
+        self.__dict__.update(SERVER_LIB.get(server_name,{}))
+        self.__dict__.update(config)
 
-		#初始化邮箱服务
-		st_SMTP = smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
-		st_IMAP = imaplib.IMAP4_SSL if self.use_ssl else imaplib.IMAP4
-		if self.smtp_port:
-			self.st_SMTP = lambda: st_SMTP(self.smtp,self.smtp_port)
-		else:
-			self.st_SMTP = lambda: st_SMTP(self.smtp)
-		if self.imap_port:
-			self.st_IMAP = lambda: st_IMAP(self.imap, self.imap_port)
-		else:
-			self.st_IMAP = lambda: st_IMAP(self.imap)
-		self.SMTP = lambda: SMTP(self)
-		self.IMAP = lambda: IMAP(self)
+        #初始化邮箱服务
+        st_SMTP = smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
+        st_IMAP = imaplib.IMAP4_SSL if self.use_ssl else imaplib.IMAP4
+        if self.smtp_port:
+            self.st_SMTP = lambda: st_SMTP(self.smtp,self.smtp_port)
+        else:
+            self.st_SMTP = lambda: st_SMTP(self.smtp)
+        if self.imap_port:
+            self.st_IMAP = lambda: st_IMAP(self.imap, self.imap_port)
+        else:
+            self.st_IMAP = lambda: st_IMAP(self.imap)
+        self.SMTP = lambda: SMTP(self)
+        self.IMAP = lambda: IMAP(self)
 
 class SMTP(object):
 
-	def __init__(self,mail_agent):
-		self.name,self.account = mail_agent.name,mail_agent.account
-		self.server = mail_agent.st_SMTP()
-		try:
-			self.server.login(mail_agent.account, mail_agent.auth_code)
-		except:
-			self.close()
-			raise
+    def __init__(self,mail_agent):
+        self.name,self.account = mail_agent.name,mail_agent.account
+        self.server = mail_agent.st_SMTP()
+        try:
+            self.server.login(mail_agent.account, mail_agent.auth_code)
+        except:
+            self.close()
+            raise
 
-	def close(self):
-		try:
-			return self.server.quit()
-		except:
-			pass
+    def close(self):
+        try:
+            return self.server.quit()
+        except:
+            pass
 
-	def __enter__(self):
-		return self
+    def __enter__(self):
+        return self
 
-	def __exit__(self, exc_type, exc_value, traceback):
-		self.close()
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
 
-	def send(self, to_addr, html='', subject='', to_name='', png_content=''):
-		subject = subject or 'No subject'
-		to_name = to_name or "; ".join(to_addr)
-		html = '<html><body>%s</body></html>' % html
-		if html:
-			html = html.replace('{{png}}', '<img src="cid:0">')
+    def send(self, to_addr, html='', subject='', to_name='', png_content=''):
+        subject = subject or 'No subject'
+        to_name = to_name or "; ".join(to_addr)
+        html = '<html><body>%s</body></html>' % html
+        if html:
+            html = html.replace('{{png}}', '<img src="cid:0">')
 
-		msg = MIMEMultipart()
-		msg.attach(MIMEText(html, 'html', 'utf8'))
-		msg['From'] = self.name
-		msg['To'] = '%s <%s>' % (to_name, to_addr)
-		msg['Subject'] = subject
+        msg = MIMEMultipart()
+        msg.attach(MIMEText(html, 'html', 'utf8'))
+        msg['From'] = self.name
+        msg['To'] = '%s <%s>' % (to_name, to_addr)
+        msg['Subject'] = subject
 
-		if png_content:
-			m = MIMEBase('image', 'png', filename='x.png')
-			m.add_header('Content-Disposition', 'attachment', filename='x.png')
-			m.add_header('Content-ID', '<0>')
-			m.add_header('X-Attachment-Id', '0')
-			m.set_payload(png_content)
-			encode_base64(m)
-			msg.attach(m)
+        if png_content:
+            m = MIMEBase('image', 'png', filename='x.png')
+            m.add_header('Content-Disposition', 'attachment', filename='x.png')
+            m.add_header('Content-ID', '<0>')
+            m.add_header('X-Attachment-Id', '0')
+            m.set_payload(png_content)
+            encode_base64(m)
+            msg.attach(m)
 
-		self.server.sendmail(self.account, to_addr, msg.as_string())
+        self.server.sendmail(self.account, to_addr, msg.as_string())
 
 class IMAP(object):
 
-	def __init__(self, mail_agent):
+    def __init__(self, mail_agent):
 
-		self.name, self.account = mail_agent.name, mail_agent.account
-		self.conn = mail_agent.st_IMAP()
-		try:
-			self.conn.login(mail_agent.account, mail_agent.auth_code)
-			self.conn.select('INBOX')
-		except:
-			self.close()
-			raise
+        self.name, self.account = mail_agent.name, mail_agent.account
+        self.conn = mail_agent.st_IMAP()
+        try:
+            self.conn.login(mail_agent.account, mail_agent.auth_code)
+            self.conn.select('INBOX')
+        except:
+            self.close()
+            raise
 
-		def __enter__(self):
-		return self
+        def __enter__(self):
+            return self
 
-		def __exit__(self, exc_type, exc_value, traceback):
-			self.close()
+        def __exit__(self, exc_type, exc_value, traceback):
+            self.close()
 
-		def close(self):
-			try:
-				return self.conn.close()
-			except:
-				pass
+        def close(self):
+            try:
+                return self.conn.close()
+            except:
+                pass
 
-		def getSubject(self, i):
-			conn = self.conn
-			id_list = conn.search(None, '(UNSEEN)')[1][0].split()
-			try:
-				email_id = id_list[i]
-			except IndexError:
-				return None, -1
-			data = conn.fetch(email_id, 'BODY.PEEK[HEADER.FIELDS (SUBJECT)]')[1]
+        def getSubject(self, i):
+            conn = self.conn
+            id_list = conn.search(None, '(UNSEEN)')[1][0].split()
+            try:
+                email_id = id_list[i]
+            except IndexError:
+                return None, -1
+            data = conn.fetch(email_id, 'BODY.PEEK[HEADER.FIELDS (SUBJECT)]')[1]
 
-			msg = message_from_bytes(data[0][1])
-			s, encoding = decode_header(msg['Subject'])[0]
-			subject = s if type(s) is str else s.decode(encoding or 'utf-8')
-			return subject
+            msg = message_from_bytes(data[0][1])
+            s, encoding = decode_header(msg['Subject'])[0]
+            subject = s if type(s) is str else s.decode(encoding or 'utf-8')
+            return subject
 
 if __name__ == '__main__':
-	from config import settings
-	
-	if settings.MAIL_ACCOUNT and settings.MAIL_AUTH_CODE:
-		mail_agent = MailAgent(settings.MAIL_ACCOUNT, settings.MAIL_AUTH_CODE)
+    from config import settings
+    
+    if settings.MAIL_ACCOUNT and settings.MAIL_AUTH_CODE:
+        mail_agent = MailAgent(settings.MAIL_ACCOUNT, settings.MAIL_AUTH_CODE)
 
-	with mail_agent.SMTP() as s:
-		s.send(settings.MAIL_RECEIPIENTS, '测试邮件发送', '测试')
-	print("发送成功")
+    with mail_agent.SMTP() as s:
+        s.send(settings.MAIL_RECEIPIENTS, '测试邮件发送', '测试')
+    print("发送成功")
 
-	time.sleep(5)
+    time.sleep(5)
 
     with mail_agent.IMAP() as i:
         subject = i.getSubject(-1)
