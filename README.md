@@ -1,4 +1,4 @@
-# **HuobiAutomaticTradePlatform**
+# **TradeBot**
 
 ## **火币自动化交易平台机器人**
 依赖ta-lib提供指标支持
