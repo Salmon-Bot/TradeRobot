@@ -1,0 +1,6 @@
+numpy
+panadas
+websocket
+websocket-client
+talib
+

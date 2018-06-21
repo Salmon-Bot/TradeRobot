@@ -16,8 +16,6 @@ def SMA(df, period=5, type='close'):
     df['ma']= ta.SMA(df[type],period)
     return df
 
-
-
 def MACross(df, type='close', shortPeriod=5, longPeriod=20):
     '''均线交叉
     '''
@@ -27,7 +25,9 @@ def MACross(df, type='close', shortPeriod=5, longPeriod=20):
     longMA = df['long']
     #print(df)
     if len(df) <= 2 :
-        return False
-    if shortMA[1] > longMA[1] and shortMA[2] < longMA[2] :
-        return True;
-    return False
+        return '数据不足'
+    if shortMA[0] > longMA[0] and shortMA[1] < longMA[1] :
+        return '向上穿越';
+    elif shortMA[0] < longMA[0] and shortMA[1] > longMA[1] :
+        return '向下穿越'
+    return '非穿越'
