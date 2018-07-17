@@ -12,9 +12,9 @@ def send_mail(title, content):
         return
     global last_mail_datetime
     now = datetime.datetime.now()
-    if last_mail_datetime and now - last_mail_datetime < datetime.timedelta(
-            minutes=settings.N_MINUTES_STATE):
-        return
+    # if last_mail_datetime and now - last_mail_datetime < datetime.timedelta(
+    #         minutes=settings.N_MINUTES_STATE):
+    #     return
     last_mail_datetime = now
 
     if settings.MAIL_ACCOUNT and settings.MAIL_AUTH_CODE:
