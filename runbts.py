@@ -57,14 +57,14 @@ def monitor(name,symbol,period,lines,shortPeriod,longPeriod,delay=600):
 
 if __name__ == "__main__":
     # 创建两个线程
-    thread1 = huobiThread("btsusdt-1min", 'btsusdt', '1min', 200, 10, 30,30)
-    # thread2 = huobiThread("btsusdt-30min", 'btsusdt', '30min', 200, 7, 25,75)
-    # thread3 = huobiThread("btsusdt-60min", 'btsusdt', '60min', 200, 7, 25,85)
-    # thread4 = huobiThread("btsusdt-4h", 'btsusdt', '60min', 100, 7*4, 25*4,85)
+    thread1 = huobiThread("btsusdt-15min", 'btsusdt', '15min', 200, 10, 30,60)
+    thread2 = huobiThread("btsusdt-30min", 'btsusdt', '30min', 200, 7, 25,75)
+    thread3 = huobiThread("btsusdt-60min", 'btsusdt', '60min', 200, 7, 25,85)
+    thread4 = huobiThread("btsusdt-4h", 'btsusdt', '60min', 100, 7*4, 25*4,85)
 
     thread1.start()
-    # thread2.start()
-    # thread3.start()
-    # thread4.start()
+    thread2.start()
+    thread3.start()
+    thread4.start()
 
 
