@@ -21,11 +21,11 @@ class huobiThread (threading.Thread):
 
     def run(self):
         print ("开始线程：" + self.threadID)
-        monitor(self.symbol,self.period,self.lines,self.shortPeriod,self.longPeriod,self.delay)
+        monitor(self.threadID, self.symbol,self.period,self.lines,self.shortPeriod,self.longPeriod,self.delay)
         print ("退出线程：" + self.threadID)
 
 
-def monitor(symbol,period,lines,shortPeriod,longPeriod,delay=600):
+def monitor(name,symbol,period,lines,shortPeriod,longPeriod,delay=600):
     # 作为多线程的执行方法，对选定的交易对按照一定的周期进行监控，并且邮件通知,
     # 因为火币对频繁调用有一定的限制所以不能一直的去读取
     flag = 0; # 1 向上穿越 2下穿越，0 初始value
@@ -49,7 +49,7 @@ def monitor(symbol,period,lines,shortPeriod,longPeriod,delay=600):
             flag = 2
         else:
             str=""
-        print(flag)
+        print('火币交易对:%s,flag:%d' % (name, flag))
         if not str == "":
             email_handler.send_mail(str, str)    
         time.sleep(delay)
@@ -57,12 +57,14 @@ def monitor(symbol,period,lines,shortPeriod,longPeriod,delay=600):
 
 if __name__ == "__main__":
     # 创建两个线程
-    #thread1 = huobiThread("btsusdt-30min", 'btsusdt', '1min', 200, 7, 25,1)
-    thread2 = huobiThread("btsusdt-30min", 'btsusdt', '15min', 200, 7, 25,2)
-    thread3 = huobiThread("btsusdt-60min", 'btsusdt', '60min', 200, 7, 25,2)
+    thread1 = huobiThread("btsusdt-15min", 'btsusdt', '15min', 200, 10, 30,60)
+    thread2 = huobiThread("btsusdt-30min", 'btsusdt', '30min', 200, 7, 25,75)
+    thread3 = huobiThread("btsusdt-60min", 'btsusdt', '60min', 200, 7, 25,85)
+    thread4 = huobiThread("btsusdt-4h", 'btsusdt', '60min', 100, 7*4, 25*4,85)
 
-    #thread1.start()
+    thread1.start()
     thread2.start()
     thread3.start()
+    thread4.start()
 
 
